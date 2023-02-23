@@ -95,6 +95,34 @@ jobs:
       - name: Test
         run: make test
 
+  test-ebpf-exporter-aarch64:
+    name: Test ebpf_exporter (aarch64)
+    needs: build-ebpf-exporter-aarch64
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ^1.19
+
+      - uses: actions/checkout@v3
+
+      - name: Download libbpf.tar.gz
+        uses: actions/download-artifact@v3
+        with:
+          name: libbpf.aarch64.tar.gz
+
+      - name: Install libbpf
+        run: sudo tar -C / -xvvf libbpf.aarch64.tar.gz
+
+      - name: Install libelf-dev
+        run: sudo apt-get install -y libelf-dev
+
+      - name: Build
+        run: make build
+
+      - name: Test
+        run: make test
+
   lint-ebpf-exporter-x86_64:
     name: Lint ebpf_exporter (x86_64)
     needs: build-ebpf-exporter-x86_64
@@ -127,6 +155,38 @@ jobs:
         env:
           CGO_LDFLAGS: "-l bpf"
 
+  lint-ebpf-exporter-aarch64:
+    name: Lint ebpf_exporter (aarch64)
+    needs: build-ebpf-exporter-aarch64
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: ^1.19
+
+      - uses: actions/checkout@v3
+
+      - name: Download libbpf.tar.gz
+        uses: actions/download-artifact@v3
+        with:
+          name: libbpf.aarch64.tar.gz
+
+      - name: Install libbpf
+        run: sudo tar -C / -xvvf libbpf.aarch64.tar.gz
+
+      - name: Install libelf-dev
+        run: sudo apt-get install -y libelf-dev
+
+      - name: Check vendored dependencies
+        run: go mod verify
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50.0
+        env:
+          CGO_LDFLAGS: "-l bpf"
+
   build-examples-x86_64:
     name: Build examples (x86_64)
     needs: build-ebpf-exporter-x86_64
@@ -141,6 +201,33 @@ jobs:
 
       - name: Install libbpf
         run: sudo tar -C / -xvvf libbpf.x86_64.tar.gz
+
+      - name: Install libelf-dev
+        run: sudo apt-get install -y libelf-dev
+
+      - name: Install clang
+        run: sudo apt-get install -y clang
+
+      - name: Build benchmark bpf probes
+        run: make -j $(nproc) -C benchmark build
+
+      - name: Build example bpf probes
+        run: make -j $(nproc) -C examples build
+
+  build-examples-aarch64:
+    name: Build examples (aarch64)
+    needs: build-ebpf-exporter-aarch64
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download libbpf.tar.gz
+        uses: actions/download-artifact@v3
+        with:
+          name: libbpf.aarch64.tar.gz
+
+      - name: Install libbpf
+        run: sudo tar -C / -xvvf libbpf.aarch64.tar.gz
 
       - name: Install libelf-dev
         run: sudo apt-get install -y libelf-dev
