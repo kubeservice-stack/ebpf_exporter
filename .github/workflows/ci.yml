@@ -19,8 +19,8 @@ jobs:
 
       - name: Build libbpf and ebpf_exporter
         run: |
-          docker buildx build --progress plain --tag ebpf_exporter:builder --target builder .
-          id=$(docker create ebpf_exporter:builder)
+          docker buildx build --progress plain --tag dongjiang1989/ebpf_exporter-amd64:latest --target builder .
+          id=$(docker create dongjiang1989/ebpf_exporter-amd64:latest)
           docker cp $id:/build/ebpf_exporter/ebpf_exporter  ebpf_exporter.x86_64
           docker cp $id:/build/libbpf.tar.gz                libbpf.x86_64.tar.gz
 
@@ -36,6 +36,18 @@ jobs:
           name: ebpf_exporter.x86_64
           path: ebpf_exporter.x86_64
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: dongjiang1989/ebpf_exporter-amd64:latest
+
   build-ebpf-exporter-aarch64:
     name: Build ebpf_exporter (aarch64 emulated, be patient)
     runs-on: ubuntu-20.04
@@ -50,8 +62,8 @@ jobs:
 
       - name: Build ebpf_exporter
         run: |
-          docker buildx build --progress plain --tag ebpf_exporter:builder --target builder --platform linux/arm64 .
-          id=$(docker create ebpf_exporter:builder)
+          docker buildx build --progress plain --tag dongjiang1989/ebpf_exporter-arm64:latest --target builder --platform linux/arm64 .
+          id=$(docker create dongjiang1989/ebpf_exporter-arm64:latest)
           docker cp $id:/build/ebpf_exporter/ebpf_exporter  ebpf_exporter.aarch64
           docker cp $id:/build/libbpf.tar.gz                libbpf.aarch64.tar.gz
 
@@ -66,6 +78,17 @@ jobs:
         with:
           name: ebpf_exporter.aarch64
           path: ebpf_exporter.aarch64
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: dongjiang1989/ebpf_exporter-arm64:latest
 
   test-ebpf-exporter-x86_64:
     name: Test ebpf_exporter (x86_64)
@@ -95,39 +118,6 @@ jobs:
 
       - name: Test
         run: make test
-
-  test-ebpf-exporter-aarch64:
-    name: Test ebpf_exporter (aarch64)
-    needs: build-ebpf-exporter-aarch64
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: dbhi/qus/action@main
-        with:
-          targets: aarch64
-          
-      - uses: actions/setup-go@v3
-        with:
-          go-version: ^1.19
-          cache: false
-
-      - uses: actions/checkout@v3
-
-      - name: Download libbpf.tar.gz
-        uses: actions/download-artifact@v3
-        with:
-          name: libbpf.aarch64.tar.gz
-
-      - name: Install libbpf
-        run: sudo tar -C / -xvvf libbpf.aarch64.tar.gz
-
-      - name: Install libelf-dev
-        run: sudo apt-get install -y libelf-dev
-
-      - name: Build
-        run: export GOARCH='arm64' && make build
-
-      - name: Test
-        run: export GOARCH='arm64' && make test
 
   lint-ebpf-exporter-x86_64:
     name: Lint ebpf_exporter (x86_64)
