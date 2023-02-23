@@ -19,8 +19,8 @@ jobs:
 
       - name: Build libbpf and ebpf_exporter
         run: |
-          docker buildx build --progress plain --tag dongjiang1989/ebpf_exporter-amd64:latest --target builder .
-          id=$(docker create dongjiang1989/ebpf_exporter-amd64:latest)
+          docker buildx build --progress plain --tag dongjiang1989/ebpf-exporter-amd64:latest --target builder .
+          id=$(docker create dongjiang1989/ebpf-exporter-amd64:latest)
           docker cp $id:/build/ebpf_exporter/ebpf_exporter  ebpf_exporter.x86_64
           docker cp $id:/build/libbpf.tar.gz                libbpf.x86_64.tar.gz
 
@@ -62,8 +62,8 @@ jobs:
 
       - name: Build ebpf_exporter
         run: |
-          docker buildx build --progress plain --tag dongjiang1989/ebpf_exporter-arm64:latest --target builder --platform linux/arm64 .
-          id=$(docker create dongjiang1989/ebpf_exporter-arm64:latest)
+          docker buildx build --progress plain --tag dongjiang1989/ebpf-exporter-arm64:latest --target builder --platform linux/arm64 .
+          id=$(docker create dongjiang1989/ebpf-exporter-arm64:latest)
           docker cp $id:/build/ebpf_exporter/ebpf_exporter  ebpf_exporter.aarch64
           docker cp $id:/build/libbpf.tar.gz                libbpf.aarch64.tar.gz
 
