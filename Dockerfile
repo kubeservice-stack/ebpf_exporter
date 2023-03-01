@@ -14,8 +14,13 @@ RUN cd /build/ebpf_exporter && \
     make build && \
     /build/ebpf_exporter/ebpf_exporter --version
 
+RUN cd /build/ebpf_exporter/examples && \
+    apt-get install -y clang && \
+    make build 
+
 FROM gcr.io/distroless/static-debian11 as ebpf_exporter
 
 COPY --from=builder /build/ebpf_exporter/ebpf_exporter /ebpf_exporter
+COPY --from=builder /build/ebpf_exporter/examples /examples
 
 ENTRYPOINT ["/ebpf_exporter"]

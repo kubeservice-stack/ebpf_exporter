@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: dongjiang1989/ebpf_exporter-amd64:latest
+          tags: dongjiang1989/ebpf-exporter-amd64:latest
 
   build-ebpf-exporter-aarch64:
     name: Build ebpf_exporter (aarch64 emulated, be patient)
@@ -88,7 +88,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: dongjiang1989/ebpf_exporter-arm64:latest
+          tags: dongjiang1989/ebpf-exporter-arm64:latest
 
   test-ebpf-exporter-x86_64:
     name: Test ebpf_exporter (x86_64)
