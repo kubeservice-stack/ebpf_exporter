@@ -15,7 +15,7 @@ struct data_t {
 };
 
 SEC("kprobe/oom_kill_process")
-#if LINUX_VERSION_CODE > KERNEL_VERSION(4, 19, 0)
+#if LINUX_VERSION_CODE > KERNEL_VERSION(3, 10, 0)
 int BPF_KPROBE(kprobe__oom_kill_process, struct oom_control *oc, const char *message)
 #else
 int BPF_KPROBE(kprobe__oom_kill_process, struct oom_control *oc)
