@@ -46,6 +46,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          platforms: linux/amd64
           tags: dongjiang1989/ebpf-exporter-amd64:latest
 
   build-ebpf-exporter-aarch64:
@@ -54,7 +55,7 @@ jobs:
     steps:
       - uses: dbhi/qus/action@main
         with:
-          targets: aarch64
+          targets: arm64v8
 
       - uses: actions/checkout@v3
         with:
@@ -62,7 +63,7 @@ jobs:
 
       - name: Build ebpf_exporter
         run: |
-          docker buildx build --progress plain --tag dongjiang1989/ebpf-exporter-arm64:latest --target builder --platform linux/arm64 .
+          docker buildx build --progress plain --tag dongjiang1989/ebpf-exporter-arm64:latest --target builder --platform linux/arm64/v8 .
           id=$(docker create dongjiang1989/ebpf-exporter-arm64:latest)
           docker cp $id:/build/ebpf_exporter/ebpf_exporter  ebpf_exporter.aarch64
           docker cp $id:/build/libbpf.tar.gz                libbpf.aarch64.tar.gz
@@ -88,6 +89,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          platforms: linux/arm64/v8
           tags: dongjiang1989/ebpf-exporter-arm64:latest
 
   test-ebpf-exporter-x86_64:
