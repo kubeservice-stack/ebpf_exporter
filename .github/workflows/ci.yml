@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: dbhi/qus/action@main
         with:
-          targets: arm64v8
+          targets: aarch64
 
       - uses: actions/checkout@v3
         with:
